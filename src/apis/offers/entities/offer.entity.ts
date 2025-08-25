@@ -71,7 +71,7 @@ export class Offer {
     length: 50,
     nullable: false,
   })
-  paymentInstrument: 'CREDIT_CARD' | 'DEBIT_CARD' | 'EMI' | 'UPI';
+  paymentInstrument:string;
 
   @Column({ name: 'offer_title', type: 'text', nullable: false })
   offerTitle: string;

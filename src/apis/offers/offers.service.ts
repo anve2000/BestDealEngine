@@ -60,7 +60,7 @@ export class OffersService {
   }
 
   async getHighestDiscount(payload: GetHighestDiscountDto) {
-    const { bankName, amountToPay } = payload;
+    const { bankName, amountToPay, paymentInstrument } = payload;
 
     const bankId = await this.bankRepo.findOne({ where: { code: bankName } });
     if (!bankId) {
@@ -70,6 +70,7 @@ export class OffersService {
       where: {
         bank: bankId,
         minTransactionAmount: MoreThanOrEqual(amountToPay),
+        paymentInstrument
       },
     });
 

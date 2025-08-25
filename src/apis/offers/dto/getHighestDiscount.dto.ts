@@ -6,4 +6,7 @@ export class GetHighestDiscountDto {
 
   @IsNumber()
   amountToPay: number;
+
+  @IsString()
+  paymentInstrument: string;
 }
