@@ -12,4 +12,10 @@ export class OffersController {
     const resp = await this.offerService.createOffers(payload);
     return resp;
   }
+
+  @Post('highest/discount')
+  async getMaxDiscount(@Req() req, @Body() payload: CreateOfferDto, @Res() response) {
+    const resp = await this.offerService.createOffers(payload);
+    return resp;
+  }
 }

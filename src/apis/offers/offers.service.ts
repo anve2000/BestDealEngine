@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThanOrEqual, Repository } from 'typeorm';
 import { Offer } from './entities/offer.entity';
 import { CreateOfferDto } from './dto/createOffer.dto';
 import { Bank } from './entities/bank.entity';
+import { GetHighestDiscountDto } from './dto/getHighestDiscount.dto';
 
 @Injectable()
 export class OffersService {
@@ -56,5 +57,39 @@ export class OffersService {
       });
 
     await Promise.all(offerResolvers);
+  }
+
+  async getHighestDiscount(payload: GetHighestDiscountDto) {
+    const { bankName, amountToPay } = payload;
+
+    const bankId = await this.bankRepo.findOne({ where: { code: bankName } });
+    if (!bankId) {
+      return {};
+    }
+    const relevantOffers = await this.offerRepo.find({
+      where: {
+        bank: bankId,
+        minTransactionAmount: MoreThanOrEqual(amountToPay),
+      },
+    });
+
+    let maxOfferValue: number = 0;
+    for (const offer of relevantOffers) {
+      if (offer.discountType === 'percent') {
+        if (offer.discountPercent && offer?.discountPercent) {
+          let offerValue = offer?.discountPercent * 0.01 * amountToPay;
+          if (offer.maxDiscount) {
+            offerValue = Math.min(offerValue, offer.maxDiscount);
+          } else {
+          }
+          maxOfferValue = Math.max(maxOfferValue, offerValue);
+        }
+      } else {
+        if (offer.fixedDiscount)
+          maxOfferValue = Math.max(maxOfferValue, offer.fixedDiscount);
+      }
+    }
+
+    return maxOfferValue;
   }
 }
